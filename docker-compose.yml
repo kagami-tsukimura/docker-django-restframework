@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  backend:
+    build: ./backend
+    command: python /usr/backend/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/usr/backend
+    ports:
+      - 8000:8000
+    # tty: true
+    depends_on:
+      - postgres
+  # postgres:
+  #   image: postgres
+  #   ports:
+  #     - 5432:5432
+  #   environment:
+  #     - POSTGRES_DB=dbname
+  #     - POSTGRES_USER=root
+  #     - POSTGRES_PASSWORD=password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data/
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    user: '$UID:$GID'
+    ports:
+      - 15432:5432
+    volumes:
+      - ./docker/postgres/init.d:/docker-entrypoint-initdb.d
+      - ./docker/postgres/pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: '--encoding=UTF-8'
+      POSTGRES_DB: admin
+      TZ: 'Asia/Tokyo'
+    hostname: postgres
+    # tty: true
+
+  pgadmin:
+    image: dpage/pgadmin4
+    user: '$UID:$GID'
+    ports:
+      - 81:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    volumes:
+      - ./docker/pgadmin:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    # tty: true
+
+volumes:
+  postgres_data:
