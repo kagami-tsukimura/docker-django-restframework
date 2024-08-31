@@ -21,6 +21,11 @@ from django.urls import path, re_path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
+from sample.views import (  # AreaMasterRetrieveUpdateDestroyAPIView,
+    AreaMasterListCreateAPIView,
+    ExampleModelListCreateAPIView,
+    ExampleModelRetrieveUpdateDestroyAPIView,
+)
 
 from .views import HelloWorldAPIView, JSONPlaceholderAPIView
 
@@ -44,6 +49,28 @@ urlpatterns = [
     path("", custom_home, name="home"),
     path("hello/", HelloWorldAPIView.as_view(), name="hello-world"),
     path("json/", JSONPlaceholderAPIView.as_view(), name="json-placeholder"),
+    # ExampleModelのCRUDエンドポイント
+    path(
+        "examplemodel/",
+        ExampleModelListCreateAPIView.as_view(),
+        name="examplemodel-list-create",
+    ),
+    path(
+        "examplemodel/<int:pk>/",
+        ExampleModelRetrieveUpdateDestroyAPIView.as_view(),
+        name="examplemodel-detail",
+    ),
+    # AreaMasterのCRUDエンドポイント
+    path(
+        "areamaster/",
+        AreaMasterListCreateAPIView.as_view(),
+        name="areamaster-list-create",
+    ),
+    # path(
+    #     "areamaster/<int:pk>/",
+    #     AreaMasterRetrieveUpdateDestroyAPIView.as_view(),
+    #     name="areamaster-detail",
+    # ),
     # Swagger UI
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
