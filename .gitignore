@@ -1,3 +1,4 @@
-backend/backend/__pycache__
+*.pyc
+__pycache__
 venv
 docker
