@@ -93,3 +93,57 @@ urlpatterns = [
 
 Swagger UI: http://localhost:8000/swagger/
 Redoc: http://localhost:8000/redoc/
+
+## postgresql 接続方法
+
+- ※ 同一アプリケーション内で複数テーブル作る場合は、3. から行う。
+
+1. コンテナ内に入りアプリケーション作成（ここでは `sample`）。
+
+   ```bash
+   docker exec -it <コンテナ名> bash
+
+   # `sample`は任意のDjangoアプリ名
+   python3 manage.py startapp sample
+   ```
+
+2. 設定ファイルに作成したアプリケーションを追加する。
+
+   ```python: settings.py
+   INSTALLED_APPS = [
+       # 追加項目: postgresql
+       "sample", # <任意のDjangoアプリ名>
+   ]
+   ```
+
+3. テーブルを作成する。
+
+   ```python: sample/models.py
+   from django.db import models
+
+   class ExampleModel(models.Model):
+       name = models.CharField(max_length=100)
+       description = models.TextField()
+
+       def __str__(self):
+           return self.name
+   ```
+
+4. コンテナ内に入りマイグレーションファイル作成。
+
+   ```bash
+   docker exec -it <コンテナ名> bash # コンテナ内なら不要
+
+   python manage.py makemigrations sample # sample: <任意のDjangoアプリ名>
+   ```
+
+5. コンテナ内でマイグレーション実行。
+
+   ```bash
+   docker exec -it <コンテナ名> bash # コンテナ内なら不要
+
+   python manage.py migrate
+   ```
+
+6. テーブル確認(pgadmin 等)。  
+   DB に接続して、sample\_<models.py のクラス名>テーブルの存在を確認。
